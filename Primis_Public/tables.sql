@@ -20,6 +20,22 @@ CREATE TABLE  election_tweets (
 )
 
 
+<--- AZURE SQL DATABASE --->
+CREATE TABLE primary_tweets (
+    user_id UNIQUEIDENTIFIER PRIMARY KEY, 
+    actual_name varchar(50), 
+    time_created varchar(50),
+    screen_name varchar(50),
+    tweet varchar(500),
+    loca_tion text,
+    descrip_tion varchar(500),
+    verified TEXT,
+    followers int,
+    source text,
+    geo_enabled TEXT
+
+)
+
 
 <--- #ORACLE DATABASE --->
 
