@@ -1,12 +1,4 @@
 {
-  "type": "service_account",
-  "project_id": "primis-361423",
-  "private_key_id": "15ff0422745567d2790142cd0e0c5893b7982503",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC78L8XjHqaGIqh\nOVAkhCCOnvzrd81Kkv/sodOgUIa9MN6ztYAMZN5RIvGFZ8tKKLYXkf7a0h1AM0aD\nWBcvPO8gvtzOPcFVqUQ+nUv2Ps8ANj5em0oxnFenh0V8aaPaDoWW1W5ghGYBtYcy\no4kz6mvTWpDGDCph4OylAKfQEwH8fsD8N/KuO3g2YIG8nHfk+7JwaYlJUE00V83+\nW2v2Wkm9o6yL6fAXxN3A9UfNFHR4pT/H2WLUgdwcgy1zfZIwUwpwkTIC6yD7RXQU\nvRBDYjLacQHPVvDfoU5d42w5/ZbeKWiinTXxKRBZkxc+LVFibKQDcvDC6RCfJMMR\nmNI8sUNZAgMBAAECggEAHfwTANbQ2LUBqSdTuf+6kgabo5XBkxxQ6JgJA5LVbGnX\nniRfAZs2PQuuLPKaZIKKSshoONE9CXkkzt/HEypNnJPW9rCzn88ZrEO8UtVCgW4m\nFUIBXFjtQzU5yNex5KBcf+wdaBi3jZ5Aq7ubsES+X0Ibxv055dPU7Z5lJ7Vgo7/u\nwBFx256RNZZJmCgYJz/KbY+vRAlmeoUY1jGe/9iEb0VqP1OS9k+FbgeNg31ZJksK\nckyfRvG9JtVdMYBxSW8iGFpE2hN8II5TGH1/t9H9mwtdigXJ2qJXJV3Ot6qsX6bt\n6hJrw7vLPR8czfPEYIJdOEKiB3bbZZOD6/I0bqf6YQKBgQD6TiiPwm6fhhr3EgDQ\nRrSNDOJzXt41Owxde9570iRdg/wIc99ba9YaG7Zg3kBEn2k593qU11Jq6SGRSOs8\nEmoNUJQ8jucO7uwtYJfu2gGgx8i0GGhwvliYUSnpdO085ZYKEcrfgORx3SYMJbh7\nOoOLtptx1fPKyH6C/EUDFyVlqwKBgQDAN1vsfhp866HQ006rv2GMFrIO+CPhbSlG\ntYytHliuukuLsK0YceUTOmAc6wmLnyeiYL+GaONYT7h6HOsxP2Sw8doppMdlMYDy\ntIWwQ+yt9XMDWTmeerF1B1CfCWNM/Juny8USUk+c5Yy6E+/7EgEL5W1HcYoQD96f\nriaN5sKvCwKBgQCvjNmN2gPUBi4rUokXij9fHcZEvCiElOFbP2EO3pd6rvK4yuvA\nJqWGsiD7V2Uju9oFObjTYyD+sntEdivledS/eeA9iMwtAQzL1o84idXSecwd43B8\ngkOIsIQApG0u5KaScWAj2TZfVYc1xc7ZPnS8LFphQHk3o952549PV5B2+QKBgQCR\nLX7NeVVSQrp+OgsyZyMrJr0n1z1qdwN094yf+MqsdeK3SCME0oldY3rSfKdCAFx0\nJTSjNTd5LQU9nff5w1Ku3oyTZXSAtsoZBkXvIu5xWXCb99kwHKVJqdO3uuR4clay\nfpKDSw38h9gpdwOLk0adEJTgIB5SEVppKqTOCpvCjwKBgEMpZdU1tZQIgfsJX8Sb\nDSL79sB3tuME0O3LpJA0nK0S7TIsHjH3Z5NM4F8+XGVW0uUN66NN3mxrrwJIxNYP\nWndjXV8e2mXd0kcbCyrVk9e1RoTvftUXUnbg/ES8pkz+TmGnt6xBMoYSV7k7Y7TM\nPXHVSqBPdFJ2V76bXC1Ne/17\n-----END PRIVATE KEY-----\n",
-  "client_email": "primis@primis-361423.iam.gserviceaccount.com",
-  "client_id": "112965344807033754557",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/primis%40primis-361423.iam.gserviceaccount.com"
+  keys for google sheet api integration with python
 }
+
