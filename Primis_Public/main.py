@@ -63,15 +63,15 @@ def get_data():
     sf = pd.read_csv('tweets.csv')
     sf = sf.drop(sf.columns[0],axis = 1) #remove unnamed column sf[0]
     
-    sf.tweet = sf.tweet.str.replace(r'\W'," ")#replace all non aphabetic characters with space
-    sf.descrip_tion = sf.descrip_tion.str.replace(r'\W'," ")
+    #sf.tweet = sf.tweet.str.replace(r'\W'," ")#replace all non aphabetic characters with space
+    #sf.descrip_tion = sf.descrip_tion.str.replace(r'\W'," ")
     
 
     sf.to_csv(r'tweets.csv', index = False, header=True) #save to same csv file
 
 
 
-
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def connect_cass():
     cloud_config= {
             'secure_connect_bundle': r'/workspace/primis_private/Primis/prim/secure-connect-omni-database.zip',
@@ -81,7 +81,7 @@ def connect_cass():
             'set-keyspace-timeout': 10
             #when your data is a little bit much
     }
-    auth_provider = PlainTextAuthProvider('NfgbZxQxjLkGJuyBvDqeGPda', 'lUx8+nmZlK3,nQ8CBO+qSOwA9xzvxw.RoNGgJAjq3PCmBJbBt.Abu6DRT00rF3Q5c.+Blmf+rxamgOEO3DkrxbkPDmzN9.1etBDjDnK060FFGOUNLyekRZYIx7_mXIY6')
+    auth_provider = PlainTextAuthProvider('######################', 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXN9.1etBDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEx7_mXIY6')
     cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
     session = cluster.connect("tweet")
 
@@ -100,14 +100,14 @@ def connect_cass():
     session.shutdown()
 
 
-###########################################################################################################
-##################################### Cloud cost : had to put it off####################################
+
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def connect_azure():
     # download and install odbc driver
     server = 'testtech.database.windows.net'
     database = 'testtech'
     username = 'testtech'
-    password = '{Georgemichaeldagogo@1}'   
+    password = '{XXXXXXXXXXXXXXXXXXXXXXXX@1}'   
     driver= '{ODBC Driver 17 for SQL Server}'
 
 
@@ -202,6 +202,8 @@ def flow_caso(schedule=None):
     """
     with Flow("primis",schedule=schedule) as flow:
         Extract_Transform = get_data()
+        Astra_DB = connect_cass()
+        Azure_DB = connect_azure()
         SQLite_DB = connect_sqlite()
         Google_Sheets_DB = connect_gsheets()
     return flow
