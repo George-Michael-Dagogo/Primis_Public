@@ -9,7 +9,7 @@ means "first" in latin
 #### SQLite 
 #### Google Sheets and then visualizes this data.
 
-# main.py in the Primis folder
+# main.py in the Primis_Public folder
 
 ## Expalanation
 ### The EXTRACTED and TRANSFORMED tweet data has columns consisting of _time_created', 'screen_name','name', 'tweet','location', 'description','verified','followers', 'source','geo_enabled','retweet_count','truncated','lang','likes'_.
