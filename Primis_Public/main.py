@@ -1,13 +1,16 @@
-#pip install tweepy
-#pip install configparser
-#pip install cassandra-driver
+#!pip install tweepy
+#!pip install configparser
+#!pip install cassandra-driver
 #pip install pyodbc
-#pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+#pip install pandas
+#pip install "prefect*"
+#!pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
+#pip install "apache-airflow[celery]==2.3.4" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.3.4/constraints-3.7.txt"
 
 from sqlite3 import connect
 from sqlalchemy import create_engine
 import tweepy
-import pyodbc
+#import pyodbc
 import configparser
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
@@ -15,32 +18,16 @@ import pandas as pd
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
+from prefect import Flow,task
+import datetime
+from prefect.schedules import IntervalSchedule
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 
+
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def get_data():
-    """
-    This function takes no argumets, it gets data from twitter API based on keywords and returns these columns
-    columns = ['time_created', 
-                'screen_name',
-                'name', 
-                'tweet',
-                'loca_tion',
-                'descrip_tion',
-                'verified',
-                'followers', 
-                'source',
-                'geo_enabled',
-                'retweet_count',
-                'truncated',
-                'lang',
-                'likes']
-
-    I initially created a seperate function for transformation but I got errors when using them in seperate connect database functions
-    The acquired data is then saved to a csv file 'tweets.csv'
-
-    """
     api_key = config['twitter']['api_key']
     api_key_secret = config['twitter']['api_key_secret']
     access_token = config['twitter']['access_token']
@@ -51,7 +38,10 @@ def get_data():
 
     api = tweepy.API(auth)
 
-    keywords = ['buhari','PDP','APC','Peter Obi','Atiku']
+    keywords = ['Buhari OR APC OR  PeterObi OR Tinubu OR PDP OR Atiku']
+    #keywords = ['Buhari','APC', 'PeterObi','Tinubu','Atiku']
+    #it seems the api does not return every tweet containing at least one or every keyword, it returns the only tweets that contains every keyword
+    #solution was to use the OR in the keywords string as this is for tweets search only and might give errors in pure python
     limit = 300
 
     tweets = tweepy.Cursor(api.search_tweets, q = keywords,count = 200, tweet_mode = 'extended').items(limit)
@@ -69,7 +59,6 @@ def get_data():
     df = df.reset_index(drop = True)
 
     df.to_csv('tweets.csv')
-
     
     sf = pd.read_csv('tweets.csv')
     sf = sf.drop(sf.columns[0],axis = 1) #remove unnamed column sf[0]
@@ -79,42 +68,33 @@ def get_data():
     
 
     sf.to_csv(r'tweets.csv', index = False, header=True) #save to same csv file
-    
 
 
-def connect_cassandra_datastax():
-    """
-    This function exports our tweets.csv to Astra Datastax Cassandra database
 
-    cassandra-driver needs to be installed
-    your secure_connect_bundle needs to be downloaded and its path given
-    Client ID and CLient secret is also required 
-    """
+
+def connect_cass():
     cloud_config= {
-            'secure_connect_bundle': 'path\secure-connect-omni-database.zip',
+            'secure_connect_bundle': r'/workspace/primis_private/Primis/prim/secure-connect-omni-database.zip',
             'init-query-timeout': 10,
             'connect_timeout': 10,
             'write_request_timeout_in_ms' : 20000,
             'set-keyspace-timeout': 10
             #when your data is a little bit much
     }
-    auth_provider = PlainTextAuthProvider('client id', 'client secret')
+    auth_provider = PlainTextAuthProvider('NfgbZxQxjLkGJuyBvDqeGPda', 'lUx8+nmZlK3,nQ8CBO+qSOwA9xzvxw.RoNGgJAjq3PCmBJbBt.Abu6DRT00rF3Q5c.+Blmf+rxamgOEO3DkrxbkPDmzN9.1etBDjDnK060FFGOUNLyekRZYIx7_mXIY6')
     cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
     session = cluster.connect("tweet")
-    #connect to your keyspace
 
     tabela = pd.read_csv('tweets.csv', index_col=None)
     tabela.columns = ['time_created', 'screen_name','actual_name', 'tweet','loca_tion', 'descrip_tion','verified','followers', 'source','geo_enabled','retweet_count','truncated','lang','likes']
               
             
     for i, j in tabela.iterrows():
-        #remember to add '' to your {} to denote as string
         item = "'{}','{}',{},{},'{}','{}','{}','{}','{}',{},{},{},'{}',{}".format(j.actual_name,j.descrip_tion,j.followers,j.geo_enabled,j.loca_tion,j.screen_name,j.source,j.time_created,j.tweet,j.verified,j.retweet_count,j.truncated,j.lang,j.likes)
         query1 = "INSERT INTO election_tweets (user_id,actual_name,descrip_tion,followers,geo_enabled,loca_tion,screen_name,source,time_created,tweet,verified,retweet_count,truncated,lang,likes) VALUES (uuid(),"+ item +")IF NOT EXISTS;"
         session.execute(query1)
 
     #print(query1)
-    #to see what the query will look in sql format
 
     cluster.shutdown()
     session.shutdown()
@@ -122,16 +102,12 @@ def connect_cassandra_datastax():
 
 ###########################################################################################################
 ##################################### Cloud cost : had to put it off####################################
-def connect_azure_sql_database():
-
-    """
-    exports data to azure sql database
-    """
+def connect_azure():
     # download and install odbc driver
     server = 'testtech.database.windows.net'
     database = 'testtech'
     username = 'testtech'
-    password = '{your_password_here}'   
+    password = '{Georgemichaeldagogo@1}'   
     driver= '{ODBC Driver 17 for SQL Server}'
 
 
@@ -157,20 +133,17 @@ def connect_azure_sql_database():
                 query1 = "INSERT INTO primary_tweets (user_id,actual_name,descrip_tion,followers,geo_enabled,loca_tion,screen_name,source,time_created,tweet,verified) VALUES (newid(),"+ item +");"
                 cursor.execute(query1)
 
-
+@task
 def connect_sqlite():
-    """
-    saves the tweets.csv to a local sqlite3 database just for backup purposes
-    """
     engine = create_engine('sqlite:///primis.db', echo=False)
     #create engine to connect to your already created database
 
     ef = pd.read_csv('tweets.csv')
     #read your csv file
 
-    ef.to_sql('election_tweets', engine, if_exists='append', index=False
+    ef.to_sql('election_tweets', engine, if_exists='append', index=False)
 
-
+@task(max_retries=3, retry_delay=datetime.timedelta(seconds=5))
 def connect_gsheets():
     """
     exports tweets.csv to a google sheet
@@ -178,7 +151,7 @@ def connect_gsheets():
 
     """
 
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets'] #git push -u origin main
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
     SERVICE_ACCOUNT_FILE = 'keys.json'
 
     of = pd.read_csv('tweets.csv')
@@ -202,8 +175,8 @@ def connect_gsheets():
     #READ
     sheet = service.spreadsheets()
     result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID, 
-                            range='primis!A1')
-    values = result.get('values', [])
+                            range='primis!A1').execute()
+    #values = result.get('values', [])
 
 
     #WRITE
@@ -216,10 +189,28 @@ def connect_gsheets():
     print(request)
 
 
+#@flow
+#def flow_caso():
+#    get_data()
+#    connect_sqlite()
+#    connect_gsheets()
+#flow_caso()
+
+def flow_caso(schedule=None):
+    """
+    this function is for the orchestraction/scheduling of this script
+    """
+    with Flow("primis",schedule=schedule) as flow:
+        Extract_Transform = get_data()
+        SQLite_DB = connect_sqlite()
+        Google_Sheets_DB = connect_gsheets()
+    return flow
 
 
-get_data()
-connect_cass()
-connect_sqlite()
-connect_gsheets()
-#connect_azure()
+schedule = IntervalSchedule(
+    start_date = datetime.datetime.now() + datetime.timedelta(seconds = 2),
+    interval = datetime.timedelta(hours=3)
+)
+flow=flow_caso(schedule)
+
+flow.run()
